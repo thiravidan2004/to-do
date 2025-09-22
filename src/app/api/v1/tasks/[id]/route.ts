@@ -6,8 +6,9 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 // GET /api/v1/tasks/[id] - Get a specific task
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     // Authenticate the request
     const authResult = await authenticateApiRequest(request)
@@ -37,7 +38,7 @@ export async function GET(
     const { data: task, error } = await supabase
       .from('tasks')
       .select('id, title, description, completed, created_at')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('company_id', company.id)
       .single()
 
@@ -69,8 +70,9 @@ export async function GET(
 // PUT /api/v1/tasks/[id] - Update a specific task
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     // Authenticate the request
     const authResult = await authenticateApiRequest(request)
@@ -128,7 +130,7 @@ export async function PUT(
     const { data: task, error } = await supabase
       .from('tasks')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('company_id', company.id)
       .select('id, title, description, completed, created_at')
       .single()
@@ -161,8 +163,9 @@ export async function PUT(
 // DELETE /api/v1/tasks/[id] - Delete a specific task
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     // Authenticate the request
     const authResult = await authenticateApiRequest(request)
@@ -192,7 +195,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('tasks')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('company_id', company.id)
 
     if (error) {
